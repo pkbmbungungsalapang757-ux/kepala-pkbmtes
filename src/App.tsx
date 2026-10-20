@@ -2,9 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 /* ============================================================
    DASHBOARD KEPALA PKBM – Monitoring Absensi & Kinerja Guru
-   Sumber data: SARI_BULANG.xlsx (sheet AbsenSiswa, DataSiswa, DataGuru)
-   Untuk memperbarui data: ganti isi RAW_ABSEN & RAW_SISWA di bawah
-   (atau sambungkan ke Google Apps Script – lihat fungsi useData).
+   Sumber data: Google Apps Script (sheet AbsenSiswa, DataSiswa, DataGuru)
+   Isi URL tiap guru pada GURU_LIST di bawah.
    ============================================================ */
 
 type Status = "Hadir" | "Izin" | "Sakit" | "Alpha";
@@ -22,7 +21,7 @@ type AbsenRow = [
 // [nisn, nama, kelas]
 type SiswaRow = [string, string, number];
 
-// URL Web App Apps Script (hasil Deploy). Kosongkan "" untuk memakai data contoh di bawah.
+// URL Web App Apps Script (hasil Deploy). Jika kosong, ditampilkan "Belum ada data".
 const GURU_LIST: { nama: string; url: string }[] = [
   {
     nama: "Sukirman R",
@@ -74,12 +73,12 @@ const normAb = (r: unknown[]): AbsenRow => [
 ];
 
 function useData(apiUrl: string) {
-  const [data, setData] = useState<Data>(FALLBACK_DATA);
+  const [data, setData] = useState<Data>(EMPTY_DATA);
   const [loading, setLoading] = useState(!!apiUrl);
   const [error, setError] = useState("");
   const reload = useCallback(async () => {
     if (!apiUrl) {
-      setData(FALLBACK_DATA);
+      setData(EMPTY_DATA);
       return;
     }
     setLoading(true);
@@ -110,203 +109,10 @@ function useData(apiUrl: string) {
   return { data, loading, error, reload };
 }
 
-const GURU = { nama: "SARI BULANG, S.Pd.I", nomorInduk: "1234" };
 const TARGET_HADIR = 85; // target % kehadiran siswa
 const AMBANG_RISIKO = 75; // siswa di bawah ini ditandai perlu perhatian
 
-const FALLBACK_DATA = {
-  ab: [
-    ["2025-10-23", "17:05", 8, "Rini", "0087139828", "Hadir", "AGAMA", 1],
-    ["2025-10-23", "17:07", 8, "HARTONO", "2877282404", "Hadir", "AGAMA", 1],
-    ["2025-10-23", "17:42", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    ["2025-10-25", "14:01", 7, "IRAWATI", "P923101983", "Hadir", "AGAMA", 1],
-    ["2025-10-25", "14:02", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2025-10-25", "14:03", 7, "HUSNIA", "P910121982", "Hadir", "AGAMA", 1],
-    ["2025-10-25", "14:26", 7, "Arya", "0087962880", "Izin", "AGAMA", 0],
-    [
-      "2025-10-25",
-      "14:26",
-      7,
-      "WAIS TAHLAL ILYAS PUTRA",
-      "0054849952",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2025-10-25", "14:26", 7, "HASRAN", "0053552617", "Alpha", "AGAMA", 0],
-    ["2025-10-25", "14:26", 7, "Jusriadi", "9978596523", "Hadir", "AGAMA", 1],
-    [
-      "2025-10-25",
-      "14:26",
-      7,
-      "M. Asrianto",
-      "P923032001",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2025-10-25", "14:26", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    [
-      "2025-10-25",
-      "14:26",
-      7,
-      "NUR ANNISA ANGGRAENI",
-      "0052536465",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2025-10-25", "14:26", 7, "NURBAYA", "P903071984", "Hadir", "AGAMA", 1],
-    ["2025-10-25", "14:26", 7, "RISMA", "P928082006", "Hadir", "AGAMA", 1],
-    [
-      "2025-10-25",
-      "14:26",
-      7,
-      "ROSMIATI DG LO'MO",
-      "P927051991",
-      "Izin",
-      "AGAMA",
-      0,
-    ],
-    [
-      "2025-10-25",
-      "14:26",
-      7,
-      "RUDI HARIANTO",
-      "P902032002",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2025-10-25", "14:26", 7, "SALAWA", "P905081974", "Hadir", "AGAMA", 1],
-    ["2025-10-30", "13:40", 8, "HAERUL", "0101079791", "Hadir", "AGAMA", 1],
-    ["2025-10-30", "13:46", 8, "Mawar", "0098101073", "Hadir", "AGAMA", 1],
-    ["2025-10-30", "13:52", 8, "HARTONO", "2877282404", "Hadir", "AGAMA", 1],
-    ["2025-10-30", "13:53", 8, "Rini", "0087139828", "Hadir", "AGAMA", 1],
-    ["2025-10-30", "21:47", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    ["2025-11-01", "14:37", 8, "Rini", "0087139828", "Hadir", "AGAMA", 1],
-    ["2025-11-01", "15:18", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "HARTONO", "2877282404", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "HAERUL", "0101079791", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "Mawar", "0098101073", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    [
-      "2025-11-06",
-      "15:09",
-      8,
-      "NURUL RAMADANI",
-      "0032259569",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2025-11-06", "15:09", 8, "RAHMA", "0067606782", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "Rini", "0087139828", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "YUL YANDA", "0078843501", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "HASNIAH", "P902041983", "Hadir", "AGAMA", 1],
-    ["2025-11-06", "15:09", 8, "RENALDI", "0064159522", "Alpha", "AGAMA", 0],
-    [
-      "2025-11-06",
-      "15:09",
-      8,
-      "RESTU NURSAING",
-      "0056385429",
-      "Alpha",
-      "AGAMA",
-      0,
-    ],
-    ["2025-11-06", "15:09", 8, "MAHRISAL", "0044544943", "Izin", "AGAMA", 0],
-    ["2025-11-06", "15:09", 8, "BASRI", "0019349073", "Hadir", "AGAMA", 1],
-    ["2026-01-31", "13:50", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-01-24", "13:51", 7, "Arya", "0087962880", "Hadir", "AGAMA", 1],
-    ["2026-01-24", "13:50", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "HARTONO", "2877282404", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "HAERUL", "0101079791", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "HASNIAH", "P902041983", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "Rini", "0087139828", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "Mawar", "0098101073", "Izin", "AGAMA", 0],
-    ["2026-02-05", "16:45", 8, "RENALDI", "0064159522", "Izin", "AGAMA", 0],
-    [
-      "2026-02-05",
-      "16:45",
-      8,
-      "NURUL RAMADANI",
-      "0032259569",
-      "Hadir",
-      "AGAMA",
-      1,
-    ],
-    ["2026-02-05", "16:45", 8, "BASRI", "0019349073", "Izin", "AGAMA", 0],
-    ["2026-02-05", "16:45", 8, "MAHRISAL", "0044544943", "Hadir", "AGAMA", 1],
-    ["2026-02-05", "16:45", 8, "RAHMA", "0067606782", "Hadir", "AGAMA", 1],
-    [
-      "2026-02-05",
-      "16:45",
-      8,
-      "RESTU NURSAING",
-      "0056385429",
-      "Alpha",
-      "AGAMA",
-      0,
-    ],
-    ["2026-02-05", "16:45", 8, "YUL YANDA", "0078843501", "Hadir", "AGAMA", 1],
-    ["2026-02-06", "13:24", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-07", "13:08", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-08", "13:05", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-12", "13:20", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-14", "09:54", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-15", "14:51", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-15", "15:06", 7, "IRAWATI", "P923101983", "Hadir", "AGAMA", 1],
-    ["2026-02-16", "20:29", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-17", "13:06", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-17", "15:31", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-17", "20:09", 8, "NUR AYNUNG", "0101402370", "Hadir", "AGAMA", 1],
-    ["2026-02-18", "11:57", 7, "HUSNIA", "P910121982", "Hadir", "AGAMA", 1],
-    ["2026-02-18", "12:05", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-18", "13:16", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-19", "13:26", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-19", "13:48", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-20", "12:42", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-20", "13:43", 7, "Arya", "0087962880", "Hadir", "AGAMA", 1],
-    ["2026-02-20", "19:25", 7, "IRAWATI", "P923101983", "Hadir", "AGAMA", 1],
-    ["2026-02-20", "19:35", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-21", "13:39", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-    ["2026-02-21", "14:48", 7, "Arya", "0087962880", "Hadir", "AGAMA", 1],
-    ["2026-02-21", "19:08", 7, "ASNIATI", "P930101984", "Hadir", "AGAMA", 1],
-    ["2026-02-26", "13:34", 7, "Nadya", "0115673812", "Hadir", "AGAMA", 1],
-  ],
-  sw: [
-    ["0087962880", "Arya", 7],
-    ["P930101984", "ASNIATI", 7],
-    ["0054849952", "WAIS TAHLAL ILYAS PUTRA", 7],
-    ["0053552617", "HASRAN", 7],
-    ["P910121982", "HUSNIA", 7],
-    ["P923101983", "IRAWATI", 7],
-    ["9978596523", "Jusriadi", 7],
-    ["P923032001", "M. Asrianto", 7],
-    ["0115673812", "Nadya", 7],
-    ["0052536465", "NUR ANNISA ANGGRAENI", 7],
-    ["P903071984", "NURBAYA", 7],
-    ["P928082006", "RISMA", 7],
-    ["P927051991", "ROSMIATI DG LO'MO", 7],
-    ["P902032002", "RUDI HARIANTO", 7],
-    ["P905081974", "SALAWA", 7],
-    ["0101079791", "HAERUL", 8],
-    ["0019349073", "BASRI", 8],
-    ["2877282404", "HARTONO", 8],
-    ["0044544943", "MAHRISAL", 8],
-    ["0098101073", "Mawar", 8],
-    ["0101402370", "NUR AYNUNG", 8],
-    ["0032259569", "NURUL RAMADANI", 8],
-    ["0067606782", "RAHMA", 8],
-    ["0064159522", "RENALDI", 8],
-    ["0056385429", "RESTU NURSAING", 8],
-    ["0087139828", "Rini", 8],
-    ["0078843501", "YUL YANDA", 8],
-    ["P902041983", "HASNIAH", 8],
-  ],
-} as Data;
+const EMPTY_DATA: Data = { ab: [], sw: [] };
 
 const STATUSES: Status[] = ["Hadir", "Izin", "Sakit", "Alpha"];
 const COLORS: Record<Status, string> = {
@@ -619,6 +425,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
       );
   }
 
+  const kosong = DATA.ab.length === 0;
+
   return (
     <div className="app">
       <style>{CSS}</style>
@@ -639,12 +447,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
 
       <header className="top">
         <div>
-          <div className="eyebrow">
-            Dashboard Kepala PKBM ·{" "}
-            <button className="linkbtn" onClick={onLogout}>
-              Keluar
-            </button>
-          </div>
+          <div className="eyebrow">Dashboard Kepala PKBM</div>
           <h1>Progres Absensi &amp; Kinerja Guru</h1>
           <p className="sub">
             {DATA.guru?.nama ?? aktif.nama} · No. Induk{" "}
@@ -702,252 +505,282 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
               ))}
             </select>
           </label>
+          <button className="logout" onClick={onLogout}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
         </div>
       </header>
 
-      {/* KPI */}
-      <section className="kpis">
-        <div className="card score">
-          <Gauge value={skor} />
-          <div>
-            <div className="lbl">Skor Kinerja Guru</div>
-            <div className="big">{skorLabel}</div>
-            <div className="muted small">
-              Kehadiran 40% · Cakupan siswa 30% · Foto bukti 20% · Konsistensi
-              bulanan 10%
-            </div>
-          </div>
+      {kosong ? (
+        <div className="card center muted" style={{ padding: 40 }}>
+          {loading
+            ? "Memuat data…"
+            : error
+            ? "Data tidak dapat ditampilkan."
+            : "Belum ada data."}
         </div>
-        <Kpi
-          label="Kehadiran Siswa"
-          value={`${ringkas.persen}%`}
-          note={`Target ${TARGET_HADIR}%`}
-          tone={tone(ringkas.persen)}
-        />
-        <Kpi
-          label="Pertemuan Tercatat"
-          value={String(ringkas.sesiArr.length)}
-          note={`${ringkas.hari} hari · rata-rata ${rataPerSesi} siswa/sesi`}
-        />
-        <Kpi
-          label="Cakupan Siswa"
-          value={`${cakupan}%`}
-          note={`${ringkas.siswaTercatat}/${totalSiswaScope} siswa pernah diabsen`}
-          tone={cakupan >= 80 ? "good" : cakupan >= 50 ? "warn" : "bad"}
-        />
-        <Kpi
-          label="Foto Bukti Hadir"
-          value={`${kelengkapanFoto}%`}
-          note={`${ringkas.foto}/${ringkas.c.Hadir} absen hadir berfoto`}
-          tone={kelengkapanFoto >= 90 ? "good" : "warn"}
-        />
-      </section>
-
-      {/* Insight */}
-      <section className="card insight">
-        <h2>Ringkasan untuk Kepala PKBM</h2>
-        <ul>
-          {insight.map((t, i) => (
-            <li key={i}>{t}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="grid2">
-        {/* Komposisi */}
-        <div className="card">
-          <h2>Komposisi Status Kehadiran</h2>
-          {STATUSES.map((s) => (
-            <div className="row" key={s}>
-              <span className="dot" style={{ background: COLORS[s] }} />
-              <span className="rl">{s}</span>
-              <div className="track">
-                <div
-                  className="fill"
-                  style={{
-                    width: `${pct(ringkas.c[s], ringkas.c.total)}%`,
-                    background: COLORS[s],
-                  }}
-                />
+      ) : (
+        <>
+          {/* KPI */}
+          <section className="kpis">
+            <div className="card score">
+              <Gauge value={skor} />
+              <div>
+                <div className="lbl">Skor Kinerja Guru</div>
+                <div className="big">{skorLabel}</div>
+                <div className="muted small">
+                  Kehadiran 40% · Cakupan siswa 30% · Foto bukti 20% ·
+                  Konsistensi bulanan 10%
+                </div>
               </div>
-              <span className="rv">
-                {ringkas.c[s]}{" "}
-                <small>({pct(ringkas.c[s], ringkas.c.total)}%)</small>
-              </span>
             </div>
-          ))}
-        </div>
-
-        {/* Tren bulanan */}
-        <div className="card">
-          <h2>Tren Bulanan</h2>
-          <TrenChart data={tren} />
-        </div>
-      </section>
-
-      {/* Per kelas */}
-      <section className="card">
-        <h2>Progres per Kelas</h2>
-        <div className="tablewrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Kelas</th>
-                <th>Pertemuan</th>
-                <th>Siswa tercatat</th>
-                <th>Hadir</th>
-                <th>Izin</th>
-                <th>Sakit</th>
-                <th>Alpha</th>
-                <th style={{ minWidth: 160 }}>% Hadir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {perKelas
-                .filter((k) => kelas === "all" || k.kelas === Number(kelas))
-                .map((k) => (
-                  <tr key={k.kelas}>
-                    <td>
-                      <b>Kelas {k.kelas}</b>
-                    </td>
-                    <td>{k.sesi}</td>
-                    <td>
-                      {k.tercatat}/{k.jml}{" "}
-                      <small className="muted">({k.cakupan}%)</small>
-                    </td>
-                    <td>{k.c.Hadir}</td>
-                    <td>{k.c.Izin}</td>
-                    <td>{k.c.Sakit}</td>
-                    <td>{k.c.Alpha}</td>
-                    <td>
-                      <Bar value={k.persen} />
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* Siswa */}
-      <section className="card">
-        <div className="head">
-          <h2>
-            Rekap Siswa{" "}
-            <small className="muted">
-              · {berisiko} berisiko (&lt;{AMBANG_RISIKO}%) · {belumAbsen} belum
-              pernah diabsen
-            </small>
-          </h2>
-          <div className="tools">
-            <input
-              placeholder="Cari nama / NISN…"
-              value={cari}
-              onChange={(e) => setCari(e.target.value)}
+            <Kpi
+              label="Kehadiran Siswa"
+              value={`${ringkas.persen}%`}
+              note={`Target ${TARGET_HADIR}%`}
+              tone={tone(ringkas.persen)}
             />
-            <select
-              value={urut}
-              onChange={(e) => setUrut(e.target.value as typeof urut)}
-            >
-              <option value="persen">Urut: % hadir terendah</option>
-              <option value="alpha">Urut: alpha terbanyak</option>
-              <option value="nama">Urut: nama A–Z</option>
-            </select>
-            <label className="chk">
-              <input
-                type="checkbox"
-                checked={hanyaRisiko}
-                onChange={(e) => setHanyaRisiko(e.target.checked)}
-              />{" "}
-              Perlu perhatian
-            </label>
-          </div>
-        </div>
-        <div className="tablewrap tall">
-          <table>
-            <thead>
-              <tr>
-                <th>Nama</th>
-                <th>NISN</th>
-                <th>Kls</th>
-                <th>H</th>
-                <th>I</th>
-                <th>S</th>
-                <th>A</th>
-                <th style={{ minWidth: 160 }}>% Hadir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {siswaTampil.map((s) => (
-                <tr key={s.nisn}>
-                  <td>{s.nama}</td>
-                  <td className="muted">{s.nisn}</td>
-                  <td>{s.kelas}</td>
-                  <td>{s.c.Hadir}</td>
-                  <td>{s.c.Izin}</td>
-                  <td>{s.c.Sakit}</td>
-                  <td>{s.c.Alpha}</td>
-                  <td>
-                    {s.c.total === 0 ? (
-                      <span className="tag bad">Belum diabsen</span>
-                    ) : (
-                      <Bar value={s.persen} />
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {!siswaTampil.length && (
-                <tr>
-                  <td colSpan={8} className="muted center">
-                    Tidak ada siswa yang cocok.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+            <Kpi
+              label="Pertemuan Tercatat"
+              value={String(ringkas.sesiArr.length)}
+              note={`${ringkas.hari} hari · rata-rata ${rataPerSesi} siswa/sesi`}
+            />
+            <Kpi
+              label="Cakupan Siswa"
+              value={`${cakupan}%`}
+              note={`${ringkas.siswaTercatat}/${totalSiswaScope} siswa pernah diabsen`}
+              tone={cakupan >= 80 ? "good" : cakupan >= 50 ? "warn" : "bad"}
+            />
+            <Kpi
+              label="Foto Bukti Hadir"
+              value={`${kelengkapanFoto}%`}
+              note={`${ringkas.foto}/${ringkas.c.Hadir} absen hadir berfoto`}
+              tone={kelengkapanFoto >= 90 ? "good" : "warn"}
+            />
+          </section>
 
-      {/* Log pertemuan */}
-      <section className="card">
-        <h2>Riwayat Pertemuan</h2>
-        <div className="tablewrap tall">
-          <table>
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Mulai</th>
-                <th>Kelas</th>
-                <th>Mapel</th>
-                <th>Hadir</th>
-                <th>Izin</th>
-                <th>Sakit</th>
-                <th>Alpha</th>
-                <th>% Hadir</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ringkas.sesiArr.map((s, i) => (
-                <tr key={i}>
-                  <td>{fmtTgl(s.tgl)}</td>
-                  <td>{s.jam}</td>
-                  <td>{s.kelas}</td>
-                  <td>{s.mapel}</td>
-                  <td>{s.c.Hadir}</td>
-                  <td>{s.c.Izin}</td>
-                  <td>{s.c.Sakit}</td>
-                  <td>{s.c.Alpha}</td>
-                  <td>
-                    <span className={`tag ${tone(pct(s.c.Hadir, s.c.total))}`}>
-                      {pct(s.c.Hadir, s.c.total)}%
-                    </span>
-                  </td>
-                </tr>
+          {/* Insight */}
+          <section className="card insight">
+            <h2>Ringkasan untuk Kepala PKBM</h2>
+            <ul>
+              {insight.map((t, i) => (
+                <li key={i}>{t}</li>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+            </ul>
+          </section>
+
+          <section className="grid2">
+            {/* Komposisi */}
+            <div className="card">
+              <h2>Komposisi Status Kehadiran</h2>
+              {STATUSES.map((s) => (
+                <div className="row" key={s}>
+                  <span className="dot" style={{ background: COLORS[s] }} />
+                  <span className="rl">{s}</span>
+                  <div className="track">
+                    <div
+                      className="fill"
+                      style={{
+                        width: `${pct(ringkas.c[s], ringkas.c.total)}%`,
+                        background: COLORS[s],
+                      }}
+                    />
+                  </div>
+                  <span className="rv">
+                    {ringkas.c[s]}{" "}
+                    <small>({pct(ringkas.c[s], ringkas.c.total)}%)</small>
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Tren bulanan */}
+            <div className="card">
+              <h2>Tren Bulanan</h2>
+              <TrenChart data={tren} />
+            </div>
+          </section>
+
+          {/* Per kelas */}
+          <section className="card">
+            <h2>Progres per Kelas</h2>
+            <div className="tablewrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kelas</th>
+                    <th>Pertemuan</th>
+                    <th>Siswa tercatat</th>
+                    <th>Hadir</th>
+                    <th>Izin</th>
+                    <th>Sakit</th>
+                    <th>Alpha</th>
+                    <th style={{ minWidth: 160 }}>% Hadir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {perKelas
+                    .filter((k) => kelas === "all" || k.kelas === Number(kelas))
+                    .map((k) => (
+                      <tr key={k.kelas}>
+                        <td>
+                          <b>Kelas {k.kelas}</b>
+                        </td>
+                        <td>{k.sesi}</td>
+                        <td>
+                          {k.tercatat}/{k.jml}{" "}
+                          <small className="muted">({k.cakupan}%)</small>
+                        </td>
+                        <td>{k.c.Hadir}</td>
+                        <td>{k.c.Izin}</td>
+                        <td>{k.c.Sakit}</td>
+                        <td>{k.c.Alpha}</td>
+                        <td>
+                          <Bar value={k.persen} />
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Siswa */}
+          <section className="card">
+            <div className="head">
+              <h2>
+                Rekap Siswa{" "}
+                <small className="muted">
+                  · {berisiko} berisiko (&lt;{AMBANG_RISIKO}%) · {belumAbsen}{" "}
+                  belum pernah diabsen
+                </small>
+              </h2>
+              <div className="tools">
+                <input
+                  placeholder="Cari nama / NISN…"
+                  value={cari}
+                  onChange={(e) => setCari(e.target.value)}
+                />
+                <select
+                  value={urut}
+                  onChange={(e) => setUrut(e.target.value as typeof urut)}
+                >
+                  <option value="persen">Urut: % hadir terendah</option>
+                  <option value="alpha">Urut: alpha terbanyak</option>
+                  <option value="nama">Urut: nama A–Z</option>
+                </select>
+                <label className="chk">
+                  <input
+                    type="checkbox"
+                    checked={hanyaRisiko}
+                    onChange={(e) => setHanyaRisiko(e.target.checked)}
+                  />{" "}
+                  Perlu perhatian
+                </label>
+              </div>
+            </div>
+            <div className="tablewrap tall">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>NISN</th>
+                    <th>Kls</th>
+                    <th>H</th>
+                    <th>I</th>
+                    <th>S</th>
+                    <th>A</th>
+                    <th style={{ minWidth: 160 }}>% Hadir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {siswaTampil.map((s) => (
+                    <tr key={s.nisn}>
+                      <td>{s.nama}</td>
+                      <td className="muted">{s.nisn}</td>
+                      <td>{s.kelas}</td>
+                      <td>{s.c.Hadir}</td>
+                      <td>{s.c.Izin}</td>
+                      <td>{s.c.Sakit}</td>
+                      <td>{s.c.Alpha}</td>
+                      <td>
+                        {s.c.total === 0 ? (
+                          <span className="tag bad">Belum diabsen</span>
+                        ) : (
+                          <Bar value={s.persen} />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {!siswaTampil.length && (
+                    <tr>
+                      <td colSpan={8} className="muted center">
+                        Tidak ada siswa yang cocok.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Log pertemuan */}
+          <section className="card">
+            <h2>Riwayat Pertemuan</h2>
+            <div className="tablewrap tall">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Mulai</th>
+                    <th>Kelas</th>
+                    <th>Mapel</th>
+                    <th>Hadir</th>
+                    <th>Izin</th>
+                    <th>Sakit</th>
+                    <th>Alpha</th>
+                    <th>% Hadir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ringkas.sesiArr.map((s, i) => (
+                    <tr key={i}>
+                      <td>{fmtTgl(s.tgl)}</td>
+                      <td>{s.jam}</td>
+                      <td>{s.kelas}</td>
+                      <td>{s.mapel}</td>
+                      <td>{s.c.Hadir}</td>
+                      <td>{s.c.Izin}</td>
+                      <td>{s.c.Sakit}</td>
+                      <td>{s.c.Alpha}</td>
+                      <td>
+                        <span
+                          className={`tag ${tone(pct(s.c.Hadir, s.c.total))}`}
+                        >
+                          {pct(s.c.Hadir, s.c.total)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
 
       <footer>
         Data: {DATA.ab.length} catatan absensi · {DATA.sw.length} siswa
@@ -1203,6 +1036,12 @@ th{position:sticky;top:0;background:var(--card);font-size:12px;color:var(--mut);
 .login input{width:100%}
 .login .btn{padding:10px;border-radius:8px;border:0;background:var(--acc);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
 .login .err{color:#dc2626;font-size:13px}
+.logout{align-self:flex-end;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 24px;border:0;border-radius:12px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-size:16px;font-weight:700;letter-spacing:.02em;cursor:pointer;box-shadow:0 6px 16px rgba(220,38,38,.35);transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+.logout svg{width:20px;height:20px;flex-shrink:0}
+.logout:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(220,38,38,.45);filter:brightness(1.05)}
+.logout:active{transform:translateY(0);box-shadow:0 3px 8px rgba(220,38,38,.35)}
+.logout:focus-visible{outline:3px solid #fca5a5;outline-offset:2px}
+@media(max-width:560px){.logout{width:100%}}
 .linkbtn{background:none;border:0;padding:0;color:var(--acc);font:inherit;text-decoration:underline;cursor:pointer;text-transform:none;letter-spacing:0}
 footer{text-align:center;color:var(--mut);font-size:12px}
 `;
@@ -1211,13 +1050,15 @@ footer{text-align:center;color:var(--mut);font-size:12px}
 // Catatan: login ini hanya di sisi browser (bukan keamanan sungguhan).
 const LOGIN_USER = "PKBM";
 const LOGIN_PASS = "1234";
-const SESSION_KEY = "pkbm-dashboard-login";
+const SESSION_KEY = "isLoggedIn";
 
-// Jika dibuka di dalam iframe portal, minta portal kembali ke halaman sebelumnya
-function kembaliKePortal() {
+// Jika dibuka di dalam iframe portal/launcher, kirim pesan ke induknya.
+// PKBM_KEMBALI = kembali ke halaman awal launcher, SISWA_KEMBALI = kembali ke halaman sebelumnya
+function kembaliKePortal(
+  type: "PKBM_KEMBALI" | "SISWA_KEMBALI" = "SISWA_KEMBALI"
+) {
   try {
-    if (window.parent !== window)
-      window.parent.postMessage({ type: "SISWA_KEMBALI" }, "*");
+    if (window.parent !== window) window.parent.postMessage({ type }, "*");
   } catch (e) {
     /* abaikan */
   }
@@ -1232,7 +1073,7 @@ const diIframe = (() => {
 
 function readSession(): boolean {
   try {
-    return sessionStorage.getItem(SESSION_KEY) === "1";
+    return sessionStorage.getItem(SESSION_KEY) === "true";
   } catch (e) {
     return false;
   }
@@ -1253,9 +1094,12 @@ export default function App() {
           } catch (e) {
             /* abaikan */
           }
+          setUser("");
           setPass("");
+          setErr("");
           setMasuk(false);
-          kembaliKePortal();
+          // Kalau dibuka lewat launcher (iframe), kembali ke halaman awal launcher
+          kembaliKePortal("PKBM_KEMBALI");
         }}
       />
     );
@@ -1268,7 +1112,7 @@ export default function App() {
       pass === LOGIN_PASS
     ) {
       try {
-        sessionStorage.setItem(SESSION_KEY, "1");
+        sessionStorage.setItem(SESSION_KEY, "true");
       } catch (e2) {
         /* abaikan */
       }
@@ -1288,7 +1132,7 @@ export default function App() {
             type="button"
             className="linkbtn"
             style={{ alignSelf: "flex-start" }}
-            onClick={kembaliKePortal}
+            onClick={() => kembaliKePortal("SISWA_KEMBALI")}
           >
             ← Kembali
           </button>
