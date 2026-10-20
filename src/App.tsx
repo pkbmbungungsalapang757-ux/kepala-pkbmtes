@@ -24,9 +24,18 @@ type SiswaRow = [string, string, number];
 
 // URL Web App Apps Script (hasil Deploy). Kosongkan "" untuk memakai data contoh di bawah.
 const GURU_LIST: { nama: string; url: string }[] = [
-  { nama: "Sukirman R", url: "https://script.google.com/macros/s/AKfycbxGfiZy3Lr4EkaMzSAVuTC6UtywBSv1hJj89WLqS4meNdG2HuFhlgNnump3gQFi-SMe/exec" }, // tempel URL /exec milik Sukirman
-  { nama: "Nuraeni", url: "https://script.google.com/macros/s/AKfycbxFgjcE0leOFD3X56kI2qytwEDYHvhllhkGBG2pbY0WrUfxd_rFL09XSLkDoffd1E-e/exec" }, // tempel URL /exec milik Nuraeni
-  { nama: "Heni Indrayani", url: "https://script.google.com/macros/s/AKfycbxdZP9VYcRTA0kgNv2no15-8D_lc6FFF0aywiwnZXaGxEaGyJBO081U-WnIxoKu7Ua_/exec" }, // tempel URL /exec milik Heni
+  {
+    nama: "Sukirman R",
+    url: "https://script.google.com/macros/s/AKfycbxGfiZy3Lr4EkaMzSAVuTC6UtywBSv1hJj89WLqS4meNdG2HuFhlgNnump3gQFi-SMe/exec",
+  }, // tempel URL /exec milik Sukirman
+  {
+    nama: "Nuraeni",
+    url: "https://script.google.com/macros/s/AKfycbxFgjcE0leOFD3X56kI2qytwEDYHvhllhkGBG2pbY0WrUfxd_rFL09XSLkDoffd1E-e/exec",
+  }, // tempel URL /exec milik Nuraeni
+  {
+    nama: "Heni Indrayani",
+    url: "https://script.google.com/macros/s/AKfycbxdZP9VYcRTA0kgNv2no15-8D_lc6FFF0aywiwnZXaGxEaGyJBO081U-WnIxoKu7Ua_/exec",
+  }, // tempel URL /exec milik Heni
 ];
 
 type Data = {
