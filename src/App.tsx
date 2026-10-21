@@ -434,10 +434,10 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         <div className={`card statusbar ${error ? "err" : ""}`}>
           <span>
             {loading
-              ? "Memuat data dari Google Sheets…"
+              ? "MEMUAT DATA"
               : error
               ? `Gagal memuat data: ${error}`
-              : "Data langsung dari Google Sheets"}
+              : "DATA SUDAH DIMUAT"}
           </span>
           <button onClick={reload} disabled={loading}>
             Muat ulang
