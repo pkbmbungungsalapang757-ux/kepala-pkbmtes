@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 /* ============================================================
-   DASHBOARD KEPALA PKBM – Monitoring Absensi & Kinerja Gurunn
+   DASHBOARD KEPALA PKBM – Monitoring Absensi & Kinerja Guru
    Sumber data: Google Apps Script (sheet AbsenSiswa, DataSiswa, DataGuru)
    Isi URL tiap guru pada GURU_LIST di bawah.
    ============================================================ */
